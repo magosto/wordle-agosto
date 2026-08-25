@@ -1,0 +1,59 @@
+<section class="game">
+  <div class="stats-bar">
+    <div class="stat">
+      <span class="stat-value">{{ game.stats.solvedCount }}</span>
+      <span class="stat-label">Solved Wordles</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">{{ game.stats.streak }}</span>
+      <span class="stat-label">Streak</span>
+    </div>
+  </div>
+
+  <div class="message-slot">
+    <p class="message" *ngIf="game.message" role="status">{{ game.message }}</p>
+  </div>
+
+  <div class="board" role="grid" aria-label="Wordle guesses">
+    <div class="row" *ngFor="let rowIndex of rowIndexes" role="row">
+      <div
+        class="tile"
+        *ngFor="let tile of rowTiles(rowIndex)"
+        [class.filled]="tile.state === 'filled'"
+        [class.correct]="tile.state === 'correct'"
+        [class.present]="tile.state === 'present'"
+        [class.absent]="tile.state === 'absent'"
+        role="gridcell"
+      >{{ tile.letter }}</div>
+    </div>
+  </div>
+
+  <div class="end-actions" *ngIf="game.status === 'won'">
+    <p class="end-message">🎉 Solved in {{ game.guesses.length }}/{{ maxGuesses }}!</p>
+    <button type="button" class="action-btn" (click)="game.playAgain()">Play Again</button>
+  </div>
+
+  <div class="end-actions" *ngIf="game.status === 'lost'">
+    <p class="end-message" *ngIf="!game.revealed">Out of guesses.</p>
+    <p class="end-message" *ngIf="game.revealed">The word was <strong>{{ game.answer }}</strong>.</p>
+    <div class="end-buttons">
+      <button type="button" class="action-btn secondary" *ngIf="!game.revealed" (click)="game.showWord()">Show Word</button>
+      <button type="button" class="action-btn" (click)="game.playAgain()">Play Again</button>
+    </div>
+  </div>
+
+  <div class="keyboard" *ngIf="game.status !== 'loading'">
+    <div class="keyboard-row" *ngFor="let row of keyboardRows">
+      <button
+        type="button"
+        class="key"
+        *ngFor="let key of row"
+        [class.wide]="key === 'ENTER' || key === 'BACKSPACE'"
+        [class.correct]="keyState(key) === 'correct'"
+        [class.present]="keyState(key) === 'present'"
+        [class.absent]="keyState(key) === 'absent'"
+        (click)="onKeyClick(key)"
+      >{{ key === 'BACKSPACE' ? '⌫' : key }}</button>
+    </div>
+  </div>
+</section>
